@@ -79,11 +79,11 @@ app.use("/css", express.static(__dirname + '/css'));
 
 io.set('log level', 1); // reduce logging
 
-//Force xhr-polling, this means no websockets (because appfog doesn't support websockets)
+/*//Force xhr-polling, this means no websockets (because appfog doesn't support websockets)
 io.configure(function () { 
   io.set("transports", ["xhr-polling"]); 
   io.set("polling duration", 10); 
-});
+});*/
 
 var lastId = 0;
 function nextId () {
