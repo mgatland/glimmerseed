@@ -1,0 +1,16 @@
+{
+  "name": "glimmerseed",
+  "subdomain": "mgatland-glimmerseed",
+  "scripts": {
+    "start": "node chat-server.js"
+  },
+  "version": "0.0.0-2",
+  "engines": {
+    "node": "0.10.x",
+    "npm": "1.2.x"
+  },
+  "dependencies": {
+    "express": "3.1.x",
+    "socket.io": "0.9.16"
+  }
+}

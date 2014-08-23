@@ -1,0 +1,32 @@
+---
+title: Space Protector
+categories: [games]
+description: A platform game
+order: 10
+date: 2014-06-28
+icon: spaceprotector/spaceprotector-icon.png
+---
+<html lang="en-US">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css/game.css">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimal-ui">
+		<script src="./socket.io/socket.io.js"></script>
+		<script data-main="js/game" src="js/require.js"></script>
+		{% include analytics.html %}
+	</head>
+	<body>
+		<div class="gamecontainer hide">
+			<canvas id="gamescreen">Unfortunately, your browser cannot run this game because it does not support the HTML5 canvas element.</canvas>
+			<div id="menu">
+				<p>GLIMMERSEED</p>
+				<div id="connection-options">
+					<p>choose a name seed hunter</p><br>
+					<input id="name-input" maxlength="10">
+					<a id="connect-button" href="#">connect</a>
+				</div>
+				<p id="alerts"></p>
+			</div>
+		</div>
+	</body>
+</html>
