@@ -103,6 +103,7 @@ io.sockets.on('connection', function (socket) {
     user.queuedMoves = [];
     user.map = null;
     user.diveMoves = 0;
+    user.brick = 0;
     user.secrets = {}; //not replicated
     user.isReal = function() {
         return !(this.name === false);
@@ -128,13 +129,34 @@ io.sockets.on('connection', function (socket) {
             user.socket.broadcast.emit("data", data);
         }
 
-        if (data.type === "break") {
-            //broadcast to all players including sender
-            //TODO: obviously not everyone needs this.
-            io.sockets.emit("data", data);
+        if (data.type === "ping") {
+            user.socket.emit("data", {type:"pong", num:data.num});
+        }
 
-            //TODO: Update the server's copy of the map.
+        if (data.type === "break") {
+
             var pos = data.pos;
+            var dir = data.dir;
+
+            //broadcast to all players including sender
+            if (user.brick === 0) {
+                io.sockets.emit("data", {
+                type:"break",
+                pos: pos});
+                user.brick = 1;
+            } else {
+                if (dir === 3) pos.x--;
+                if (dir === 2) pos.x++;
+                console.log(dir);
+                io.sockets.emit("data", {
+                type:"lay",
+                pos: pos});  
+                user.brick = 0;
+            }
+
+            //TODO: obviously not everyone needs this.
+            //TODO: Update the server's copy of the map.
+            
         }
     });
 

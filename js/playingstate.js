@@ -155,6 +155,9 @@ define(["entity", "level", "camera", "player"],
 			} else if (data.type === "break") {
 				var pos = data.pos;
 				this.getLevel().setCell(pos.x, pos.y, 0);
+			} else if (data.type === "lay") {
+				var pos = data.pos;
+				this.getLevel().setCell(pos.x, pos.y, 1);
 			} else {
 				console.log("Weird data: ", data);
 			}

@@ -43,6 +43,12 @@ define([], function () {
     });
 
     socket.on('data', function (data) {
+
+    	if (data.type === "pong") {
+    		pong(data.num);
+    		return;
+    	}
+
 			if (simulateNetworkProblems === true) {
 				causeFakeNetworkProblems(dataCallback, data);
 			} else {
@@ -66,6 +72,22 @@ define([], function () {
 		} else {
 			reallySend(data);
 		}
+	}
+
+	var pingNum = 0;
+	var pingTime = [];
+	Network.ping = function () {
+		pingNum++;
+		pingTime[pingNum] = Date.now();
+		this.send({
+			type:"ping", 
+			num: pingNum
+		});
+	}
+
+	var pong = function (num) {
+		var delay = Date.now() - pingTime[num];
+		console.log("latency: " + delay);
 	}
 
 	var connectButton = document.querySelector("#connect-button");

@@ -54,8 +54,11 @@ define(["explosion", "events", "colors", "entity", "dir", "pos",
 					//network collision with wall
 					Network.send({
 						type:"break", 
-						pos:level.posToGridPos(checkPos).toData()
+						pos:level.posToGridPos(checkPos).toData(),
+						dir: Dir.toId(this.dir)
 					});
+					//test hacks
+					Network.ping();
 				}
 
 				//Move out of wall to place explosion correctly.
