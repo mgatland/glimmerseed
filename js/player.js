@@ -9,6 +9,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		Util.extend(this, new WalkingThing(level, startPos, new Pos(5,6)));
 
 		//Replicated variables
+		this.id = null; //replicated in but not out.
 		this.state = "falling";
 		this.fallingTime = 0;
 		this.loading = 0;
@@ -33,6 +34,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 
 		this.toData = function () {
 			var data = {};
+			data.id = this.id; //server should ignore this.
 			data.state = this.state;
 			data.fallingTime = this.fallingTime;
 			data.loading = this.loading;
@@ -56,6 +58,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		}
 
 		this.fromData = function (data) {
+			this.id = data.id;
 			this.state = data.state;
 			this.fallingTime = data.fallingTime;
 			this.loading = data.loading;

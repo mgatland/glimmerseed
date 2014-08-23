@@ -1,6 +1,6 @@
 "use strict";
-define(["entity", "level", "camera"],
-	function (Entity, Level, Camera) {
+define(["entity", "level", "camera", "Player"],
+	function (Entity, Level, Camera, Player) {
 
 		var mapData = [];
 		mapData[0] =
@@ -13,7 +13,7 @@ define(["entity", "level", "camera"],
 		"O O                                O               m OOOOO        OO O\n" +
 		"O O                                            OOOOOOOOOOO     m  OO O\n" +
 		"O O                    ! O    m       ! OO  k  O              OO     O\n" +
-		"O Opp !  OOO OO  k    OOOO    OOO    OOOOOOOOOOO          m   OO     O\n" +
+		"O Op  !  OOO OO  k    OOOO    OOO    OOOOOOOOOOO          m   OO     O\n" +
 		"O OOOOOOOOOOOOOOOOOOOOOOOOOOO OOO  k OOOOOOOOOOO         OO          O\n" +
 		"O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO      m  OO   !      O\n" +
 		"O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO     OO      OO      O\n" +
@@ -51,7 +51,6 @@ define(["entity", "level", "camera"],
 			explosions: [],
 			players: [],
 			local: 0,
-			other: 1,
 			monsters: []
 		};
 
@@ -106,8 +105,6 @@ define(["entity", "level", "camera"],
 			gs.explosions.forEach(function (exp) {exp.update();});
 
 			gs.local = 0;
-			gs.other = 1;
-			gs.players[1].hidden = false;
 			gs.players[gs.local].update(keys);
 
 			if (netFrame === 0) {
@@ -159,10 +156,25 @@ define(["entity", "level", "camera"],
 			}
 		};
 
+		var getIndexOfUser = function (users, id) {
+			var index = null;
+			users.forEach(function (user, i) {
+				if (user.id === id) {
+					index = i;
+				}
+			});
+			if (index === null) {
+				index = users.length;
+				gs.players[index] = new Player(level, 0, 0);
+			}
+			return index;
+		}
+
 		this.gotData = function (data) {
 			if (data.type === "p") {
-				gs.players[gs.other].fromData(data.player);
-				if (gs.players[gs.other].shotThisFrame) gs.players[gs.other]._shoot();
+				var index = getIndexOfUser(gs.players, data.player.id);
+				gs.players[index].fromData(data.player);
+				if (gs.players[index].shotThisFrame) gs.players[index]._shoot();
 			} else {
 				console.log("Weird data: ", data);
 			}

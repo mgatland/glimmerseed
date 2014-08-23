@@ -1,4 +1,4 @@
-//This might not be used. Leftover from Ducks.
+
 (function(exports){
 
 	exports.Pos = function(x, y) {
@@ -8,5 +8,15 @@
 	        return "(" + this.x + "," + this.y + ")";
 	    }
 	}
+
+    exports.getIndexOfUser = function (name, users) {
+        var index = null;
+        users.forEach(function(user, idx) {
+            if (user.name === name) {
+                index = idx;
+            }
+        });
+        return index;
+    }
 
 })(typeof exports === 'undefined'? this['shared']={}: exports);

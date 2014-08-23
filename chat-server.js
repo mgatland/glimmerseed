@@ -59,17 +59,23 @@ io.configure(function () {
   io.set("polling duration", 10); 
 });
 
+var lastId = 0;
+function nextId () {
+    return lastId++;
+}
+
 io.sockets.on('connection', function (socket) {
 
     var user = {};
+    user.id = nextId();
     user.socket = socket;
-    user.pos = new shared.Pos(5,5);
+    user.pos = null;
     user.name = false;
     user.color = false;
     user.moved = false;
     user.act = false;
     user.queuedMoves = [];
-    user.map = shared.startingPos();
+    user.map = null;
     user.diveMoves = 0;
     user.secrets = {}; //not replicated
     user.isReal = function() {
@@ -92,8 +98,8 @@ io.sockets.on('connection', function (socket) {
         if (data.type === "p") {
             var p = data.player;
             user.netUser = p;
-            //add a name
-            p.name = user.name;
+            //add id to the net data.
+            p.id = user.id;
             //broadcast on to other players
             user.socket.broadcast.emit("data", data);
         }
@@ -160,7 +166,7 @@ io.sockets.on('connection', function (socket) {
 
         user.socket.emit('data', { type: 'servermessage', data: { text: 'You arrived in Duck Town.'} });
 
-        user.socket.emit('data', { type: 'loggedin', data: { name: user.name, color: user.color } });
+        user.socket.emit('data', { type: 'loggedin', data: { name: user.name, color: user.color, id: user.id } });
 
         socket.broadcast.emit('data', { type: 'servermessage', data: { text: user.name + ' arrived in Duck Town.'} });
 
@@ -602,17 +608,17 @@ function addMessage(chatObj) {
     var datagram = { type:"messages", data: data };
 
     users.forEach(function (usr) {
-        var distance = chatObj.map ? shared.distanceBetweenPos(usr.map, chatObj.map) : 0;
+        /*var distance = chatObj.map ? shared.distanceBetweenPos(usr.map, chatObj.map) : 0;
         if (distance < 2) {
             usr.socket.emit('data', datagram);    
-        }
+        }*/
     });
 
     lurkers.forEach(function (usr) {
-        var distance = chatObj.map ? shared.distanceBetweenPos(shared.startingPos(), chatObj.map) : 0;
+        /*var distance = chatObj.map ? shared.distanceBetweenPos(shared.startingPos(), chatObj.map) : 0;
         if (distance < 2) {
             usr.socket.emit('data', datagram);
-        }
+        }*/
     });
 }
 
