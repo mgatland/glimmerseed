@@ -127,6 +127,15 @@ io.sockets.on('connection', function (socket) {
             //broadcast on to other players
             user.socket.broadcast.emit("data", data);
         }
+
+        if (data.type === "break") {
+            //broadcast to all players including sender
+            //TODO: obviously not everyone needs this.
+            io.sockets.emit("data", data);
+
+            //TODO: Update the server's copy of the map.
+            var pos = data.pos;
+        }
     });
 
     socket.on('sendchat', function (data) {
@@ -188,13 +197,8 @@ io.sockets.on('connection', function (socket) {
         var index = shared.getIndexOfUser(user.name, lurkers);
         lurkers.splice(index, 1);
 
-        user.socket.emit('data', { type: 'servermessage', data: { text: 'You arrived in Duck Town.'} });
-
         user.socket.emit('data', { type: 'loggedin', data: { name: user.name, color: user.color, id: user.id } });
-
         user.socket.emit('data', { type: 'level', level: mapData[0] });
-
-        socket.broadcast.emit('data', { type: 'servermessage', data: { text: user.name + ' arrived in Duck Town.'} });
 
         var netUser = getNetUser(user);
         broadcast('playerUpdate', netUser);

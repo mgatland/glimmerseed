@@ -194,8 +194,8 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 			return (leftFoot || rightFoot);
 		}
 
-		this._shoot = function () {
-			Events.shoot(new Shot(level, this.pos.clone(), this.dir, "player"));
+		this._shoot = function (isLocal) {
+			Events.shoot(new Shot(level, this.pos.clone(), this.dir, "player", isLocal));
 			Events.playSound("pshoot", this.pos.clone());
 		}
 
@@ -240,7 +240,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 
 			if (keys.shootHit || keys.shoot && this.loading === 0) {
 				this.loading = this.refireRate;
-				this._shoot();
+				this._shoot(true);
 				this.shotThisFrame = true;
 			} else {
 				this.shotThisFrame = false;

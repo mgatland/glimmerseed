@@ -152,6 +152,9 @@ define(["entity", "level", "camera", "Player"],
 				var index = getIndexOfUser(gs.players, data.player.id);
 				gs.players[index].fromData(data.player);
 				if (gs.players[index].shotThisFrame) gs.players[index]._shoot();
+			} else if (data.type === "break") {
+				var pos = data.pos;
+				this.getLevel().setCell(pos.x, pos.y, 0);
 			} else {
 				console.log("Weird data: ", data);
 			}

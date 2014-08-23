@@ -1,6 +1,6 @@
 "use strict";
-define(["monster", "player", "events", "colors"],
-	function (Monster, Player, Events, Colors) {
+define(["monster", "player", "events", "colors", "pos"],
+	function (Monster, Player, Events, Colors, Pos) {
 	var Level = function(mapData, tileSize) {
 		var level = this; //for use in private methods
 		var map = [];
@@ -102,6 +102,12 @@ define(["monster", "player", "events", "colors"],
 			var x = Math.floor(pos.x / tileSize);
 			var y = Math.floor(pos.y / tileSize);
 			return this.isSolid(x, y);
+		}
+
+		this.posToGridPos = function (pos) {
+			var x = Math.floor(pos.x / tileSize);
+			var y = Math.floor(pos.y / tileSize);
+			return new Pos(x, y);
 		}
 
 		this.cellDepthAt = function (p) {
