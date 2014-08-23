@@ -1,5 +1,5 @@
 "use strict";
-define(["entity", "level", "camera", "Player"],
+define(["entity", "level", "camera", "player"],
 	function (Entity, Level, Camera, Player) {
 
 	//TODO: Events is only passed in so we can access changes made
