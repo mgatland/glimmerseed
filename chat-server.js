@@ -10,6 +10,32 @@ console.log("listening on port " + port);
 
 var shared = require('./shared/shared');
 
+
+//fixme
+
+    var mapData = [];
+    mapData[0] =
+    "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
+    "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   x                      O           O\n" +
+    "O !    m      O ! O m O m O   O   x !                    O           O\n" +
+    "O OOO OOO OOO O O O O O O O O O OOOOOOOOOOOOOOOO  OOO  OOO    @      O\n" +
+    "O OOO OOO OOO k O m O   O   O   OOOO                   OOO    OO     O\n" +
+    "O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                  OOOO    OO  m  O\n" +
+    "O O                                O               m OOOOO        OO O\n" +
+    "O O                                            OOOOOOOOOOO     m  OO O\n" +
+    "O O                    ! O    m       ! OO  k  O              OO     O\n" +
+    "O Op  !  OOO OO  k    OOOO    OOO    OOOOOOOOOOO          m   OO     O\n" +
+    "O OOOOOOOOOOOOOOOOOOOOOOOOOOO OOO  k OOOOOOOOOOO         OO          O\n" +
+    "O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO      m  OO   !      O\n" +
+    "O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO     OO      OO      O\n" +
+    "O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   m OO      OO      O\n" +
+    "O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO  OO                 O\n" +
+    "O  !                 O       x mm            !    OO                 O\n" +
+    "O  O   m O  m O  k O !       x OO           OOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
+    "O  OOOOOOOOOOOOOOOOOOO    OOOO OO OOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
+    "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
+    "";
+
 //consts
 var moveDelay = 1000/4;
 
@@ -84,8 +110,6 @@ io.sockets.on('connection', function (socket) {
     lurkers.push(user);
  
     console.log(getTimestamp() + ' Connection accepted. ' + lurkers.length + " lurkers.");
- 
-    sendNetUsersTo(user.socket);
 
     var cursedMessages = ["woof woof!", "i'm so happy!", "hey everyone i found a secret", "meet me by the fountain", "dinosaur rawr!"];
 
@@ -167,6 +191,8 @@ io.sockets.on('connection', function (socket) {
         user.socket.emit('data', { type: 'servermessage', data: { text: 'You arrived in Duck Town.'} });
 
         user.socket.emit('data', { type: 'loggedin', data: { name: user.name, color: user.color, id: user.id } });
+
+        user.socket.emit('data', { type: 'level', level: mapData[0] });
 
         socket.broadcast.emit('data', { type: 'servermessage', data: { text: user.name + ' arrived in Duck Town.'} });
 

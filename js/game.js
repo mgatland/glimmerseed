@@ -1,29 +1,43 @@
 "use strict";
 require(["events", "colors", "network", "bridge", "playingstate",
-	"titlestate", "endlevelstate", "camera", "audio"], 
+	"titlestate", "endlevelstate", "camera", "audio", 
+	"loadinglevelstate"], 
 	function(Events, Colors, Network, Bridge, PlayingState,
-		TitleState, EndLevelState, Camera, Audio) {
+		TitleState, EndLevelState, Camera, Audio, LoadingLevelState) {
 	var initGame = function () {
 
-		var level = 0; //TODO: replicate?
-
 		var state = new TitleState();
-		Network.connectToServer(function (data) {
+
+		var onData = function (data) {
 			if (state.gotData) {
-				state.gotData(data);
+				var accepted = state.gotData(data);
+				//Hacks: replay unaccepted messages
+				if (!accepted) {
+					console.log("Message must be replayed: " + data.type);
+					window.setTimeout(function () {
+						onData(data)
+					}, 64);
+				}
 			} else {
 				console.log("Got data but game is not running.");
 			}
-		});
+		};
+
+		Network.connectToServer(onData);
 
 		var update = function(keyboard) {
 
 			if (state.transition === true) {
 				if (state.endStats) {
 					state = new EndLevelState(state.endStats);
-					level++;
 				} else {
-					state = new PlayingState(Events, camera, level);	
+					if (state.levelData) {
+						var levelData = state.levelData;
+						state = new PlayingState(Events, camera, levelData);		
+					} else {
+						state = new LoadingLevelState();
+					}
+					
 				}
 			}
 
