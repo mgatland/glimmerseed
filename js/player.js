@@ -256,6 +256,14 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 
 			if (this.loading > 0) this.loading--;
 
+			if (keys.up && !keys.down) {
+				this.vDir = Dir.UP;
+			} else if (keys.down && !keys.up) {
+				this.vDir = Dir.DOWN;
+			} else {
+				this.vDir = null;
+			}
+
 			if (keys.shootHit || keys.shoot && this.loading === 0) {
 				this.loading = this.refireRate;
 				this._shoot(true);
@@ -281,14 +289,6 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 				this.dir = Dir.RIGHT;
 				movingDir = Dir.RIGHT;
 				this.tryMove(1,0);
-			}
-
-			if (keys.up && !keys.down) {
-				this.vDir = Dir.UP;
-			} else if (keys.down && !keys.up) {
-				this.vDir = Dir.DOWN;
-			} else {
-				this.vDir = null;
 			}
 
 			//If you hit jump and hold it down, that hit gets queued.
