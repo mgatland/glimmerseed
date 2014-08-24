@@ -2,10 +2,10 @@
 define([], function () {
 	var Colors = {
 		blank: "#000000",
-		background: "#5CCCCC",
-		bad: "#8598FF",
-		good: "#B2FFFF",
-		highlight: "#FFFFFF"
+		background: "#A63F3F",
+		bad: "#F27244",
+		good: "#F2B05E",
+		highlight: "#F6D7B7"
 	};
 	return Colors;
 });

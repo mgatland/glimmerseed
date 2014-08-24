@@ -13,28 +13,66 @@ var shared = require('./shared/shared');
 
 //fixme
 
-    var mapData = [];
-    mapData[0] =
-    "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
-    "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   x                      O           O\n" +
-    "O !    m      O ! O m O m O   O   x !                    O           O\n" +
-    "O OOO OOO OOO O O O O O O O O O OOOOOOOOOOOOOOOO  OOO  OOO    @      O\n" +
-    "O OOO OOO OOO k O m O   O   O   OOOO                   OOO    OO     O\n" +
-    "O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                  OOOO    OO  m  O\n" +
-    "O O                                O               m OOOOO        OO O\n" +
-    "O O                                            OOOOOOOOOOO     m  OO O\n" +
-    "O O                    ! O    m       ! OO  k  O              OO     O\n" +
-    "O Op  !  OOO OO  k    OOOO    OOO    OOOOOOOOOOO          m   OO     O\n" +
-    "O OOOOOOOOOOOOOOOOOOOOOOOOOOO OOO  k OOOOOOOOOOO         OO          O\n" +
-    "O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO      m  OO   !      O\n" +
-    "O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO     OO      OO      O\n" +
-    "O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   m OO      OO      O\n" +
-    "O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO  OO                 O\n" +
-    "O  !                 O       x mm            !    OO                 O\n" +
-    "O  O   m O  m O  k O !       x OO           OOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
-    "O  OOOOOOOOOOOOOOOOOOO    OOOO OO OOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
-    "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
-    "";
+  var mapData = [];
+mapData[0] =
+"OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
+"OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   x                      O           O\n" +
+"O !    m      O ! O m O m O   O   x !                    O           O\n" +
+"O OOO OOO OOO O O O O O O O O O OOOOOOOOOOOOOOOO  OOO  OOO    @      O\n" +
+"O OOO OOO OOO k O m O   O   O   OOOO                   OOO    OO     O\n" +
+"O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO                  OOOO    OO  m  O\n" +
+"O O                                O               m OOOOO        OO O\n" +
+"O O                                            OOOOOOOOOOO     m  OO O\n" +
+"O O                    ! O    m       ! OO  k  O              OO     O\n" +
+"O Op  !  OOO OO  k    OOOO    OOO    OOOOOOOOOOO          m   OO     O\n" +
+"O OOOOOOOOOOOOOOOOOOOOOOOOOOO OOO  k OOOOOOOOOOO         OO          O\n" +
+"O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO      m  OO   !      O\n" +
+"O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO     OO      OO      O\n" +
+"O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO   m OO      OO      O\n" +
+"O OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO  OO                 O\n" +
+"O  !                 O       x mm            !    OO                 O\n" +
+"O  O   m O  m O  k O !       x OO           OOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
+"O  OOOOOOOOOOOOOOOOOOO    OOOO OO OOOO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
+"OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n" +
+"";
+
+function loadMap(mapData) {
+    var map = {};
+    map.map = [];
+    map.spawners = [];
+    var n = 0;
+    var x = 0;
+    var y = 0;
+    map.map[y] = [];
+    while (mapData[n]) {
+        if (mapData[n]==="O") {
+            map.map[y][x] = 1;
+            x++;
+        } else if (mapData[n]===" ") {
+            map.map[y][x] = 0;
+            x++;
+        } else if (mapData[n] === "\n") {
+            x = 0;
+            y++;
+            map.map[y] = [];
+        } else {
+            map.map[y][x] = 0;
+            map.spawners.push({x:x, y:y, type:mapData[n]});
+            x++;
+        }
+        n++;
+    }
+    return map;
+}
+var level = loadMap(mapData[0]);
+
+var setCell = function(x, y, value) {
+    if (!level.map[y]) {
+        level.map[y] = [];
+    }
+    level.map[y][x] = value;
+}
+//end of fixme level hacks
 
 //consts
 var moveDelay = 1000/4;
@@ -144,6 +182,8 @@ io.sockets.on('connection', function (socket) {
                 type:"break",
                 pos: pos});
                 user.brick = 1;
+                //and apply to server
+                setCell(pos.x, pos.y, 0);
             } else {
                 if (dir === 3) pos.x--;
                 if (dir === 2) pos.x++;
@@ -152,7 +192,8 @@ io.sockets.on('connection', function (socket) {
                 console.log(dir);
                 io.sockets.emit("data", {
                 type:"lay",
-                pos: pos});  
+                pos: pos});
+                setCell(pos.x, pos.y, 1);
                 user.brick = 0;
             }
 
@@ -222,7 +263,7 @@ io.sockets.on('connection', function (socket) {
         lurkers.splice(index, 1);
 
         user.socket.emit('data', { type: 'loggedin', data: { name: user.name, color: user.color, id: user.id } });
-        user.socket.emit('data', { type: 'level', level: mapData[0] });
+        user.socket.emit('data', { type: 'level', level: level });
 
         var netUser = getNetUser(user);
         broadcast('playerUpdate', netUser);

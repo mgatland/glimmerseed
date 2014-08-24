@@ -39,29 +39,8 @@ define(["monster", "player", "events", "colors", "pos"],
 		}
 
 		var loadMap = function (mapData) {
-			map = [];
-			var n = 0;
-			var x = 0;
-			var y = 0;
-			map[y] = [];
-			while (mapData[n]) {
-				if (mapData[n]==="O") {
-					map[y][x] = 1;
-					x++;
-				} else if (mapData[n]===" ") {
-					map[y][x] = 0;
-					x++;
-				} else if (mapData[n] === "\n") {
-					x = 0;
-					y++;
-					map[y] = [];
-				} else {
-					map[y][x] = 0;
-					spawners.push({x:x, y:y, type:mapData[n]});
-					x++;
-				}
-				n++;
-			}
+			map = mapData.map;
+			spawners = mapData.spawners;
 			spawnEntities();
 		}
 
