@@ -60,9 +60,10 @@ define(["entity", "level", "camera", "player"],
 			gs.shots.forEach(function (shot) {
 				if (shot.live === true) {
 					if (shot.hitsMonsters === true) {
-						gs.monsters.forEach(function (monster) {
-							Entity.checkCollision(shot, monster);
-						});
+						//hacks: no shooting monsters
+						//gs.monsters.forEach(function (monster) {
+						//	Entity.checkCollision(shot, monster);
+						//});
 					} else {
 						gs.players.forEach(function (player) {
 							Entity.checkCollision(shot, player);

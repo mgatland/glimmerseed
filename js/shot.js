@@ -17,6 +17,7 @@ define(["explosion", "events", "colors", "entity", "dir", "pos",
 
 		this.hitsMonsters = (owner === "player");
 		this.killPlayerOnTouch = !this.hitsMonsters;
+
 		this.isLocal = !!isLocal;
 
 		this.pos.moveXY(2,1);
