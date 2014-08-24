@@ -14,6 +14,7 @@ define(["explosion", "events", "colors", "entity", "dir", "pos",
 		var _this = this;
 
 		this.dir = dir;
+		this.age = 0;
 
 		this.hitsMonsters = (owner === "player");
 		this.killPlayerOnTouch = !this.hitsMonsters;
@@ -90,6 +91,11 @@ define(["explosion", "events", "colors", "entity", "dir", "pos",
 				if (this.dir === Dir.DOWN) checkPos.moveXY(-2, -2);
 				checkPos.moveXY(0, -2); //explosion starts above the shot
 				Events.explosion(new Explosion(this.dir, owner, checkPos));
+			}
+
+			this.age++;
+			if (this.age > 35) {
+				this.live = false;
 			}
 		}
 
