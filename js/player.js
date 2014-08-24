@@ -203,6 +203,15 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 			Events.playSound("pshoot", this.pos.clone());
 		}
 
+		this.hurt = function (hurtPos) {
+			if (!this.live) return;
+			this.live = false;
+			deadTimer = maxDeadTime;
+			hitPos = hurtPos.clampWithin(_this.pos, _this.size);
+			deaths++;
+			Events.playSound("pdead", null);
+		}
+
 		this.update = function (keys) {
 			
 			if (this.hidden) return;
@@ -218,14 +227,14 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 				return;
 			}
 
+			if (this.isStuck()) {
+				this.hurt(this.pos.clone());
+			}
+
 			this.collisions.forEach(function (other) {
 				if (_this.live === false) return; //so we can't die twice in this loop
 				if (other.killPlayerOnTouch) {
-					_this.live = false;
-					deadTimer = maxDeadTime;
-					hitPos = other.pos.clone().clampWithin(_this.pos, _this.size);
-					deaths++;
-					Events.playSound("pdead", null);
+					_this.hurt(other.pos.clone());
 				}
 				if (other.isCheckpoint && other !== currentCheckpoint) {
 					if (currentCheckpoint) currentCheckpoint.selected = false;
