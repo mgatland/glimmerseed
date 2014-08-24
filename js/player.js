@@ -1,6 +1,6 @@
 "use strict";
-define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "util", "spritedata"], 
-	function (Shot, Events, Colors, WalkingThing, Sprites, Dir, Pos, Util, SpriteData) {
+define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "util", "spritedata", "network"], 
+	function (Shot, Events, Colors, WalkingThing, Sprites, Dir, Pos, Util, SpriteData, Network) {
 
 	var Player = function (level, x, y) {
 		var _this = this;
@@ -210,6 +210,11 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 			hitPos = hurtPos.clampWithin(_this.pos, _this.size);
 			deaths++;
 			Events.playSound("pdead", null);
+			//clear my spawn point
+			Network.send({
+				type:"clearspawn", 
+				pos:level.posToGridPos(spawnPoint).toData()
+			});
 		}
 
 		this.update = function (keys) {

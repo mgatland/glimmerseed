@@ -215,7 +215,14 @@ io.sockets.on('connection', function (socket) {
 
             //TODO: obviously not everyone needs this.
             //TODO: Update the server's copy of the map.
-            
+        }
+
+        if (data.type === "clearspawn") {
+            console.log(user.name + " died Clearing spawn.");
+            var pos = data.pos;
+            io.sockets.emit("data", {
+            type:"break",
+            pos: pos});
         }
     });
 
