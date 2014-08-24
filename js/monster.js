@@ -274,6 +274,21 @@ define(["shot", "events", "colors", "entity", "walkingthing",
 			animDelay = 0;
 		}
 
+		this.hurt = function (damage, hurtPos) {
+			if (!this.live) return;
+			hitPos = hurtPos;
+			this.health -= damage;
+			if (onHit) onHit();
+			
+			if (this.health <= 0) { 
+				this.live = false;
+				Events.playSound("mdead", this.pos.clone());
+				return;
+			} else {
+				Events.playSound("mhit", this.pos.clone());
+			}
+		}
+
 		this.update = function () {
 			if (this.live === false) {
 				if (deadTime < maxDeadTime) deadTime++;
@@ -291,19 +306,15 @@ define(["shot", "events", "colors", "entity", "walkingthing",
 
 			if (ai) ai();
 
-			if (this.collisions.length > 0) {
-				this.health--;
-				hitPos = this.collisions[0].pos.clone();
-				hitPos.clampWithin(this.pos, this.size);
-				if (onHit) onHit();
+			if (this.isStuck()) {
+				this.hurt(1, this.pos.clone());
+			}
+
+			if (this.live && this.collisions.length > 0) {
+				var shotPos = this.collisions[0].pos.clone();
+				shotPos.clampWithin(this.pos, this.size);
+				this.hurt(1, shotPos);
 				this.collisions.length = 0;
-				if (this.health == 0) { 
-					this.live = false;
-					Events.playSound("mdead", this.pos.clone());
-					return;
-				} else {
-					Events.playSound("mhit", this.pos.clone());
-				}
 			}
 		};
 

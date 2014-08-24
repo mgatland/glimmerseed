@@ -12,6 +12,10 @@ define(["entity", "dir", "pos", "util"], function (Entity, Dir, Pos, Util) {
 			return (level.cellDepthAt(frontFoot) >= minHeight);
 		}
 
+		this.isStuck = function () {
+			return level.isColliding(this);
+		}
+
 		this.tryMove = function (x, y) {
 			var ok = true;
 			while (x != 0) {
