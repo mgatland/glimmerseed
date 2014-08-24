@@ -223,6 +223,8 @@ io.sockets.on('connection', function (socket) {
             io.sockets.emit("data", {
             type:"break",
             pos: pos});
+            //and apply to server
+            setCell(pos.x, pos.y, 0);
         }
     });
 
