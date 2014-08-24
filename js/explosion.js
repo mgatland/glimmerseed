@@ -1,8 +1,12 @@
 "use strict";
-define(["colors", "sprites"], function (Colors, Sprites) {
+define(["colors", "sprites", "dir"], 
+	function (Colors, Sprites, Dir) {
 
 	var expSpriteData = "v1.0:000000000000000000000000001110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001100000000000010000000001100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000100000000000010000000000100000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000001000000000000010000000001000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000101000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-	var expSprite = Sprites.loadFramesFromData(expSpriteData);
+	var expSpriteH = Sprites.loadFramesFromData(expSpriteData);
+	var expSpriteDown = Sprites.rotate(expSpriteH);
+	var temp = Sprites.flip(expSpriteH);
+	var expSpriteUp = Sprites.rotate(temp);
 
 	var Explosion = function (dir, owner, pos) {
 		this.dir = dir;
@@ -20,9 +24,12 @@ define(["colors", "sprites"], function (Colors, Sprites) {
 
 	  this.draw = function (painter) {
 		  if (this.live) {
+		  	var sprite = expSpriteH;
+		  	if (this.dir === Dir.UP) sprite = expSpriteUp;
+		  	if (this.dir === Dir.DOWN) sprite = expSpriteDown;
 				var frame = Math.floor(5 * this.age / this.maxAge);
 				var color = this.owner === "player" ? Colors.good : Colors.bad;
-				painter.drawSprite2(this.pos.x, this.pos.y, 5, this.dir, expSprite[frame], color);
+				painter.drawSprite2(this.pos.x, this.pos.y, 5, this.dir, sprite[frame], color);
 			}
 		}
 	};

@@ -147,6 +147,8 @@ io.sockets.on('connection', function (socket) {
             } else {
                 if (dir === 3) pos.x--;
                 if (dir === 2) pos.x++;
+                if (dir === 1) pos.y--;
+                if (dir === 0) pos.y++;
                 console.log(dir);
                 io.sockets.emit("data", {
                 type:"lay",

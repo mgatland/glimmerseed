@@ -6,7 +6,8 @@ define(["explosion", "events", "colors", "entity", "dir", "pos",
 		Network) {
 
 	console.log("Define Shot");
-	var shotSprite0 = "111111\n";
+	var shotSpriteH = "111111\n";
+	var shotSpriteV = "1\n1\n1\n1\n1\n1\n";
 
 	var Shot = function (level, pos, dir, owner, isLocal) {
 		Util.extend(this, new Entity(pos, new Pos(5,1)));
@@ -20,11 +21,21 @@ define(["explosion", "events", "colors", "entity", "dir", "pos",
 
 		this.pos.moveXY(2,1);
 
+		if (!dir.isHorizontal) {
+			this.size.x = 1;
+			this.size.y = 5;
+		}
+
 		if (dir === Dir.LEFT) {
 			this.pos.moveXY(-8, 0);
-		} else {
+		} else if (dir === Dir.RIGHT) {
 			this.pos.moveXY(3, 0);
+		} else if (dir === Dir.UP) {
+
+		} else {
+
 		}
+
 		this.update = function () {
 			if (this.live === false) return;
 
@@ -42,8 +53,12 @@ define(["explosion", "events", "colors", "entity", "dir", "pos",
 			var checkPos;
 			if (this.dir === Dir.LEFT) {
 				checkPos = this.pos;
-			} else {
+			} else if (this.dir === Dir.RIGHT) {
 				checkPos = this.pos.clone().moveXY(this.size.x, 0);
+			} else if (this.dir === Dir.UP) {
+				checkPos = this.pos;
+			} else if (this.dir === Dir.DOWN) {
+				checkPos = this.pos.clone().moveXY(0, this.size.y);
 			}
 			
 			if (level.isPointColliding(checkPos)) {
@@ -70,15 +85,18 @@ define(["explosion", "events", "colors", "entity", "dir", "pos",
 				}
 				//Move to the left side of the explosion
 				if (this.dir === Dir.RIGHT) checkPos.moveXY(-4, 0);
+				if (this.dir === Dir.UP) checkPos.moveXY(-2, -5);
+				if (this.dir === Dir.DOWN) checkPos.moveXY(-2, -2);
 				checkPos.moveXY(0, -2); //explosion starts above the shot
 				Events.explosion(new Explosion(this.dir, owner, checkPos));
 			}
 		}
 
 		this.draw = function (painter) {
+			var sprite = this.dir.isHorizontal ? shotSpriteH : shotSpriteV;
 			if (this.live) {
 				var color = this.hitsMonsters ? Colors.good : Colors.bad;
-				painter.drawSprite(this.pos.x, this.pos.y, shotSprite0, color);
+				painter.drawSprite(this.pos.x, this.pos.y, sprite, color);
 			}
 		}
 	}

@@ -15,6 +15,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		this.loading = 0;
 		this.refireRate = 15;
 		this.dir = Dir.RIGHT;
+		this.vDir = null;
 		this.shotThisFrame = false;
 		this.groundedY = this.pos.y;
 
@@ -39,6 +40,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 			data.fallingTime = this.fallingTime;
 			data.loading = this.loading;
 			data.dir = Dir.toId(this.dir);
+			data.vDir = Dir.toId(this.vDir);
 			data.shotThisFrame = this.shotThisFrame;
 			data.groundedY = this.groundedY;
 
@@ -63,6 +65,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 			this.fallingTime = data.fallingTime;
 			this.loading = data.loading;
 			this.dir = Dir.fromId(data.dir);
+			this.vDir = Dir.fromId(data.vDir);
 			this.shotThisFrame = data.shotThisFrame;
 			this.groundedY = data.groundedY;
 
@@ -195,7 +198,8 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		}
 
 		this._shoot = function (isLocal) {
-			Events.shoot(new Shot(level, this.pos.clone(), this.dir, "player", isLocal));
+			var dir = (this.vDir ? this.vDir : this.dir);
+			Events.shoot(new Shot(level, this.pos.clone(), dir, "player", isLocal));
 			Events.playSound("pshoot", this.pos.clone());
 		}
 
@@ -263,6 +267,14 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 				this.dir = Dir.RIGHT;
 				movingDir = Dir.RIGHT;
 				this.tryMove(1,0);
+			}
+
+			if (keys.up && !keys.down) {
+				this.vDir = Dir.UP;
+			} else if (keys.down && !keys.up) {
+				this.vDir = Dir.DOWN;
+			} else {
+				this.vDir = null;
 			}
 
 			//If you hit jump and hold it down, that hit gets queued.

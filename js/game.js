@@ -44,6 +44,8 @@ require(["events", "colors", "network", "bridge", "playingstate",
 			var keys = {};
 			keys.left = keyboard.isKeyDown(KeyEvent.DOM_VK_LEFT);
 			keys.right = keyboard.isKeyDown(KeyEvent.DOM_VK_RIGHT);
+			keys.up = keyboard.isKeyDown(KeyEvent.DOM_VK_UP);
+			keys.down = keyboard.isKeyDown(KeyEvent.DOM_VK_DOWN);
 			keys.jumpIsHeld = keyboard.isKeyDown(KeyEvent.DOM_VK_X);
 			keys.jumpIsHit = keyboard.isKeyHit(KeyEvent.DOM_VK_X);
 
