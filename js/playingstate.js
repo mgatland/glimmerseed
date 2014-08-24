@@ -9,6 +9,8 @@ define(["entity", "level", "camera", "player"],
 		this.showTouchButtons = true;
 
 		var tileSize = 10;
+		this.monsterHost = false;
+		var monsterToSend = 0;
 
 		var level = new Level(mapData, tileSize);
 		var netFramesToSkip = 0;
@@ -89,6 +91,20 @@ define(["entity", "level", "camera", "player"],
 				var playerData = gs.players[gs.local].toData();
 				Network.send({type:"p", player:playerData});
 				netFrame = netFramesToSkip;
+
+				if (this.monsterHost) {
+					var netMonsters = [];
+					//send one monster each update
+					monsterToSend++;
+					if (monsterToSend >= gs.monsters.length) {
+						monsterToSend = 0;
+					}
+					var monster = gs.monsters[monsterToSend];
+					if (monster) {
+						netMonsters[monsterToSend] = monster.toData();
+						Network.send({type:"mon", monsters:netMonsters});
+					}
+				}
 			} else {
 				netFrame--;
 			}
@@ -159,6 +175,17 @@ define(["entity", "level", "camera", "player"],
 			} else if (data.type === "lay") {
 				var pos = data.pos;
 				this.getLevel().setCell(pos.x, pos.y, 1);
+			} else if (data.type === "monsterHost") {
+				console.log("You are the monster host");
+				this.monsterHost = true;
+			} else if (data.type === "mon") {
+				console.log("got monsters");
+					gs.monsters.forEach(function (monster, index) {
+						var monsterData = data.monsters[index];
+						if (monsterData) {
+							monster.fromData(data.monsters[index]);
+						}
+					});
 			} else {
 				console.log("Weird data: ", data);
 			}

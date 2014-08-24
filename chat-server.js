@@ -12,6 +12,7 @@ var shared = require('./shared/shared');
 
 
 //fixme
+var monsterHost = null;
 
   var mapData = [];
 mapData[0] =
@@ -104,6 +105,17 @@ var colors = [  //in order of attractiveness
 
 var unusedColors = colors.slice(0);
 
+function electMonsterHost () {
+    for (var i = 0; i < users.length; i++) {
+        if (users[i].isReal()) {
+            monsterHost = users[i];
+            users[i].socket.emit("data", 
+                {type:"monsterHost"});
+            return;
+        }
+    }
+}
+
 // routing
 app.get('/', function (req, res) {
   res.sendfile(__dirname + '/index.html');
@@ -169,6 +181,10 @@ io.sockets.on('connection', function (socket) {
 
         if (data.type === "ping") {
             user.socket.emit("data", {type:"pong", num:data.num});
+        }
+
+        if (data.type === "mon") {
+            user.socket.broadcast.emit("data", data);
         }
 
         if (data.type === "break") {
@@ -267,6 +283,10 @@ io.sockets.on('connection', function (socket) {
 
         var netUser = getNetUser(user);
         broadcast('playerUpdate', netUser);
+
+        if (monsterHost === null) {
+            electMonsterHost();
+        }
     };
 
     socket.on('cmd', processCommand);
@@ -285,6 +305,11 @@ io.sockets.on('connection', function (socket) {
             var index = shared.getIndexOfUser(user.name, lurkers);
             lurkers.splice(index, 1);
             console.log("Removed a lurker, " + lurkers.length + " remain.");
+        }
+
+        if (user === monsterHost) {
+            monsterHost = null;
+            electMonsterHost();
         }
     });
 

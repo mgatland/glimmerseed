@@ -11,7 +11,8 @@ define(["colors"], function (Colors) {
 				this.transition = true;
 				this.levelData = data.level;
 			}
-			return true; //always
+			if (data.type === "monsterHost") return false;
+			return true;
 		}
 
 		this.update = function (keys, painter, Network, Events) {

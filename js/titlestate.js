@@ -3,7 +3,6 @@ define(["colors"], function (Colors) {
 	var TitleState = function () {
 
 		this.gotData = function (data) {
-			console.log(data);
 			if (data.type === "loggedin") {
 				console.log("Logged in");
 				this.transition = true;
