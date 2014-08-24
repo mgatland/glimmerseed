@@ -10,6 +10,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 
 		//Replicated variables
 		this.id = null; //replicated in but not out.
+		this.name = null;
 		this.state = "falling";
 		this.fallingTime = 0;
 		this.loading = 0;
@@ -36,6 +37,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		this.toData = function () {
 			var data = {};
 			data.id = this.id; //server should ignore this.
+			data.name = undefined; //server will fill it in
 			data.state = this.state;
 			data.fallingTime = this.fallingTime;
 			data.loading = this.loading;
@@ -61,6 +63,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 
 		this.fromData = function (data) {
 			this.id = data.id;
+			this.name = data.name;
 			this.state = data.state;
 			this.fallingTime = data.fallingTime;
 			this.loading = data.loading;
@@ -187,6 +190,12 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 				var decay = (maxDeadTime - deadTimer) / maxDeadTime;
 				painter.drawSprite2(this.pos.x, this.pos.y, this.size.x, 
 					this.dir, img, Colors.highlight, false, decay, hitPos);
+			}
+
+			if (this.name) {
+				var name = this.name;
+				painter.drawText(this.pos.x - name.length * 1.5, this.pos.y + 10,
+					name, Colors.good, true, 5);
 			}
 			
 		}

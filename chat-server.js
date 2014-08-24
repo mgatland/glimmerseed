@@ -173,8 +173,10 @@ io.sockets.on('connection', function (socket) {
         if (data.type === "p") {
             var p = data.player;
             user.netUser = p;
-            //add id to the net data.
+            //add id and name to the net data.
+            //todo: don't waste bandwidth with name.
             p.id = user.id;
+            p.name = user.name;
             //broadcast on to other players
             user.socket.broadcast.emit("data", data);
         }

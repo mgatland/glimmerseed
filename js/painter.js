@@ -51,7 +51,10 @@ define(["pos", "dir", "colors"], function (Pos, Dir, Colors) {
 		}
 
 		//relative defaults to false
-		this.drawText = function(x, y, text, color, relative) {
+		//size defaults to 10
+		this.drawText = function(x, y, text, color, relative, size) {
+			if (!size) size = 10;
+			ctx.font = (pixelSize * size) + "px Star Perv";
 			var myPos = (relative === true ? pos : noOffset);
 			setColor(color);
 			ctx.fillText(text, (x - myPos.x) * pixelSize, (y - myPos.y) * pixelSize);
