@@ -157,16 +157,16 @@ define(["entity", "level", "camera", "player"],
 					index = i;
 				}
 			});
-			if (index === null) {
-				index = users.length;
-				gs.players[index] = new Player(level, 0, 0);
-			}
 			return index;
 		}
 
 		this.gotData = function (data) {
 			if (data.type === "p") {
 				var index = getIndexOfUser(gs.players, data.player.id);
+				if (index === null) {
+					index = gs.players.length;
+					gs.players[index] = new Player(level, 0, 0);
+				}
 				gs.players[index].fromData(data.player);
 				if (gs.players[index].shotThisFrame) gs.players[index]._shoot();
 			} else if (data.type === "break") {
@@ -180,12 +180,17 @@ define(["entity", "level", "camera", "player"],
 				this.monsterHost = true;
 			} else if (data.type === "mon") {
 				console.log("got monsters");
-					gs.monsters.forEach(function (monster, index) {
-						var monsterData = data.monsters[index];
-						if (monsterData) {
-							monster.fromData(data.monsters[index]);
-						}
-					});
+				gs.monsters.forEach(function (monster, index) {
+					var monsterData = data.monsters[index];
+					if (monsterData) {
+						monster.fromData(data.monsters[index]);
+					}
+				});
+			} else if (data.type === "dc") {
+				var index = getIndexOfUser(gs.players, data.id);
+				if (index != null) {
+					gs.players.splice(index, 1);
+				}
 			} else {
 				console.log("Weird data: ", data);
 			}

@@ -298,12 +298,12 @@ io.sockets.on('connection', function (socket) {
     };
 
     socket.on('disconnect', function(){
-        console.log(getTimestamp() + " Peer "
+        console.log(getTimestamp() + " "
             + user.name + " disconnected.");
         if (user.isReal()) {
             unusedColors.push(user.color);
             sendServerMessage(socket.broadcast, user.name + ' disappeared.');
-            socket.broadcast.emit('data', { type: 'playerleaves', data: user.name });
+            socket.broadcast.emit('data', { type: 'dc', id: user.id });
             var index = shared.getIndexOfUser(user.name, users);
             console.log("removing user " + user.name);
             users.splice(index, 1);
