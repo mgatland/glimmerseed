@@ -67,6 +67,19 @@ define(["monster", "player", "events", "colors", "pos"],
 			});
 		}
 
+		//actor must have pos, size
+		//this returns a grid coord, not real coord
+		this.trace = function (actor, dir) {
+			var tracePos = actor.pos.clone();
+			tracePos.moveXY(
+				Math.floor(actor.size.x/2), 
+				Math.floor(actor.size.y/2));
+			while (!this.isPointColliding(tracePos)) {
+				tracePos.moveInDir(dir, tileSize);
+			}
+			return this.posToGridPos(tracePos);
+		}
+
 		this.isColliding = function (player) {
 			//find out which cell each corner is in.
 			//If a corner is inside a solid square, return true.
@@ -87,6 +100,12 @@ define(["monster", "player", "events", "colors", "pos"],
 			var x = Math.floor(pos.x / tileSize);
 			var y = Math.floor(pos.y / tileSize);
 			return new Pos(x, y);
+		}
+
+		this.gridPosToPos = function (gridPos) {
+			var x = gridPos.x * tileSize;
+			var y = gridPos.y * tileSize;
+			return new Pos(x, y);			
 		}
 
 		this.cellDepthAt = function (p) {

@@ -1,6 +1,6 @@
 "use strict";
-define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "util", "spritedata", "network"], 
-	function (Shot, Events, Colors, WalkingThing, Sprites, Dir, Pos, Util, SpriteData, Network) {
+define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "util", "spritedata", "network", "blockremovefx"], 
+	function (Shot, Events, Colors, WalkingThing, Sprites, Dir, Pos, Util, SpriteData, Network, BlockRemoveFx) {
 
 	var Player = function (level, x, y) {
 		var _this = this;
@@ -210,6 +210,10 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 			var dir = (this.vDir ? this.vDir : this.dir);
 			Events.shoot(new Shot(level, this.pos.clone(), dir, "player", isLocal));
 			Events.playSound("pshoot", this.pos.clone());
+			//trace a line from the player to a block.
+			var hitGridPos = level.trace(this, dir);
+			var hitPos = level.gridPosToPos(hitGridPos);
+			Events.explosion(new BlockRemoveFx(dir, "break", hitPos));
 		}
 
 		this.hurt = function (hurtPos) {
