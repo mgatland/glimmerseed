@@ -21,7 +21,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		this.shotThisFrame = false;
 		this.groundedY = this.pos.y;
 
-		var blockToolRange = 7;
+		var blockToolRange = 6;
 		var spawnPoint = startPos.clone();
 		var currentCheckpoint = null; //The flag entity we last touched
 
@@ -217,21 +217,36 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 			
 			//trace a line from the player to a block.
 			var hitGridPos = level.trace(this, dir);
-			var hitPos = level.gridPosToPos(hitGridPos);
-			var inRange = (level.posToGridPos(this.pos).distanceTo(hitGridPos) < blockToolRange);
-			if (isLocal && inRange) {
+			var inRange = (level.posToGridPos(this.pos).distanceTo(hitGridPos) <= blockToolRange);
+			if (inRange) {
 				Events.playSound("pshoot", this.pos.clone());
-				//network collision with wall
-				Network.send({
-					type:"break", 
-					pos: hitGridPos.toData(),
-					dir: Dir.toId(dir)
-				});
-				Events.explosion(new BlockRemoveFx(dir, "break", hitPos));
-				//test hacks
-				Network.ping();
+
+				if (this.block === 0) {
+					this.block = 1;
+					var hitPos = level.gridPosToPos(hitGridPos);
+					Events.explosion(new BlockRemoveFx(dir, "break", hitPos));
+				} else {
+					this.block = 0;
+					var movedGridPos = hitGridPos.clone().moveInDir(dir.reverse, 1);
+					var movedHitPos = level.gridPosToPos(movedGridPos);
+					Events.explosion(new BlockRemoveFx(dir, "break", movedHitPos));
+				}
+				if (isLocal) {
+					//network collision with wall
+					Network.send({
+						type:"break", 
+						pos: hitGridPos.toData(),
+						dir: Dir.toId(dir)
+					});
+					//Also do a ping test.
+					Network.ping();
+				}
 			} else {
 				Events.playSound("hitwall", this.pos.clone());
+				var missGridPos = level.posToGridPos(this.pos);
+				missGridPos.moveInDir(dir, blockToolRange);
+				var missPos = level.gridPosToPos(missGridPos);
+				Events.explosion(new BlockRemoveFx(dir, "fail", missPos));
 			}
 		}
 

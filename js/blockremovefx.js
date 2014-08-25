@@ -11,8 +11,12 @@ define(["colors", "sprites", "dir"],
 		this.type = type;
 		this.pos = pos;
 		this.age = 0;
-		this.maxAge = 49;
-	  this.live = true;
+		this.maxAge = 7*7;
+	  	this.live = true;
+
+	  	if (type === "fail") {
+	  		this.maxAge = 7*1;
+	  	}
 
 	  this.update = function () {
 	  	this.age++;
