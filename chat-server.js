@@ -171,12 +171,9 @@ io.sockets.on('connection', function (socket) {
         }
         //player update
         if (data.type === "p") {
-            var p = data.player;
-            user.netUser = p;
-            //add id and name to the net data.
-            //todo: don't waste bandwidth with name.
-            p.id = user.id;
-            p.name = user.name;
+            //Add id and name to the net data.
+            data.playerId = user.id;
+            data.playerName = user.name;
             //broadcast on to other players
             user.socket.broadcast.emit("data", data);
         }
@@ -332,22 +329,6 @@ io.sockets.on('connection', function (socket) {
     }
 
 });
-
-function sendNetUsersTo(socket) {
-    var state = getAllNetUsers();
-    var datagram = { type:'state', data: state };
-    socket.emit("data", datagram);
-};
-
-function getAllNetUsers() {
-    var state = {};
-    state.users = users.map( getNetUser );
-    return state;
-}
-
-function getNetUser (user) {
-        return user.netUser;
-    }
 
 var ackData = {};
 ackData.type = "ack";

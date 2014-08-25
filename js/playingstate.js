@@ -91,9 +91,19 @@ define(["entity", "level", "camera", "player"],
 			gs.players[gs.local].update(keys);
 
 			if (netFrame === 0) {
-				var playerData = gs.players[gs.local].toData();
+				var playerData = gs.players[gs.local].toBinary();
 				Network.send({type:"p", player:playerData});
 				netFrame = netFramesToSkip;
+
+				/*//test binary compression
+				var player = gs.players[gs.local];
+				console.log("before");
+				console.log(player.toData());
+				var playerBinary = gs.players[gs.local].toBinary();
+				var playerTest = player.fromBinary(playerBinary);
+				console.log("after");
+				console.log(player.toData());
+				//end of test*/
 
 				if (this.monsterHost) {
 					var netMonsters = [];
@@ -172,12 +182,14 @@ define(["entity", "level", "camera", "player"],
 
 		this.gotData = function (data) {
 			if (data.type === "p") {
-				var index = getIndexOfUser(gs.players, data.player.id);
+				var index = getIndexOfUser(gs.players, data.playerId);
 				if (index === null) {
 					index = gs.players.length;
 					gs.players[index] = new Player(level, 0, 0);
 				}
-				gs.players[index].fromData(data.player);
+				gs.players[index].fromBinary(data.player);
+				//add the name, which wasn't binary encoded
+				gs.players[index].name = data.playerName;
 				if (gs.players[index].shotThisFrame) gs.players[index]._shoot();
 			} else if (data.type === "break") {
 				var pos = data.pos;

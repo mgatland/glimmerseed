@@ -15,7 +15,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		this.state = "falling";
 		this.fallingTime = 0;
 		this.loading = 0;
-		this.refireRate = 15;
+		this.refireRate = 30;
 		this.dir = Dir.RIGHT;
 		this.vDir = null;
 		this.shotThisFrame = false;
@@ -62,6 +62,109 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 
 			WalkingThing.toData(this, data);
 			return data;
+		}
+
+		var stateToBinary = function (stateString) {
+			if (stateString === "falling") return 0;
+			if (stateString === "jumping") return 1;
+			if (stateString === "grounded") return 2;
+			console.log("Invalid state " + stateString);
+			return 0;
+		}
+
+		var stateFromBinary = function (state) {
+			if (state === 0) return "falling";
+			if (state === 1) return "jumping";
+			if (state === 2) return "grounded";
+			console.log("Invalid state " + state);
+			return "falling";
+		}
+
+		var animStateToBinary = function (stateString) {
+			if (stateString === "falling") return 0;
+			if (stateString === "jumping") return 1;
+			if (stateString === "standing") return 2;
+			if (stateString === "running") return 3;
+			console.log("Invalid animState " + stateString);
+			return 0;
+		}
+
+		var animStateFromBinary = function (state) {
+			if (state === 0) return "falling";
+			if (state === 1) return "jumping";
+			if (state === 2) return "standing";
+			if (state === 3) return "running";
+			console.log("Invalid animState " + state);
+			return "falling";
+		}
+
+
+
+		//alternative to 'toData'
+		this.toBinary = function (data) {
+			var buffer = new ArrayBuffer(35); // 256-byte ArrayBuffer
+			var dv = new DataView(buffer);
+			dv.setUint16(0, this.id, true); //server should ignore this.
+			//name is skipped
+			dv.setUint8(2, this.block, true);
+			dv.setUint8(3, stateToBinary(this.state), true);
+			dv.setUint8(4, this.fallingTime, true);
+			dv.setUint8(5, this.loading, true);
+			dv.setUint8(6, Dir.toId(this.dir), true);
+			dv.setUint8(7, Dir.toId(this.vDir), true);
+			dv.setUint8(8, this.shotThisFrame === true ? 1 : 0, true);
+			dv.setUint16(9, this.groundedY, true);
+			//10
+			spawnPoint.toBinary(dv, 11);
+			//12
+			//13
+			//14
+			//currentCheckpoint
+			dv.setUint8(15, deadTimer, true);
+			if (hitPos) {
+				hitPos.toBinary(dv, 16);
+			} else {
+				new Pos(0,0).toBinary(dv,16); //fixme nulls not supported
+			}
+			//17,18,19
+			dv.setUint8(20, animFrame, true);
+			dv.setUint8(21, animDelay, true);
+			dv.setUint8(22, animStateToBinary(animState), true);
+			dv.setUint8(23, shootingAnim === true ? 1 : 0, true);
+			dv.setUint8(24, timeSinceLastShot, true);
+			dv.setUint8(25, jumpIsQueued === true ? 1 : 0, true);
+			WalkingThing.toBinary(this, dv, 26); //9 bytes
+			return buffer;
+		}
+
+		this.fromBinary = function (buffer) {
+			var dv = new DataView(buffer);
+			this.id = dv.getUint16(0, true);
+			//name is skipped
+			this.block = dv.getUint8(2, true);
+			this.state = stateFromBinary(dv.getUint8(3, true));
+			this.fallingTime = dv.getUint8(4, true);
+			this.loading = dv.getUint8(5, true);
+			this.dir = Dir.fromId(dv.getUint8(6, true));
+			this.vDir = Dir.fromId(dv.getUint8(7, true));
+			this.shotThisFrame = (dv.getUint8(8, true) === 1);
+			this.groundedY = dv.getUint16(9, true);
+			//10
+			this.spawnPoint = Pos.fromBinary(dv, 11);
+			//12, 13, 14
+			//currentCheckpoint
+			deadTimer = dv.getUint8(15, true);
+			hitPos = Pos.fromBinary(dv, 16);
+			if (hitPos.x === 0 && hitPos.y === 0) hitPos = null; //compatible with old code
+			//17,18,19
+			animFrame = dv.getUint8(20, true);
+			animDelay = dv.getUint8(21, true);
+			animState = animStateFromBinary(dv.getUint8(22, true));
+			shootingAnim = (dv.getUint8(23, true) === 1);
+			timeSinceLastShot = dv.getUint8(24, true);
+			jumpIsQueued = (dv.getUint8(25, true) === 1);
+			WalkingThing.fromBinary(this, dv, 26); //9 bytes
+			return this;
 		}
 
 		this.fromData = function (data) {
@@ -141,6 +244,10 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 						this.state = "grounded";
 					} else {
 						this.fallingTime++;
+						if (this.fallingTime > 255) {
+							//prevent overflow in binary mode
+							this.fallingTime = 255;
+						}
 						var speed = this.fallingTime < 10 ? 1 : 2;
 						this.tryMove(0,speed);
 					}
@@ -324,7 +431,10 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 				timeSinceLastShot = 0;
 			} else {
 				timeSinceLastShot++;
-				if (timeSinceLastShot > 30) shootingAnim = false;
+				if (timeSinceLastShot > 30) {
+					shootingAnim = false;
+					timeSinceLastShot = 30; //prevent overflow in binary
+				}
 			}
 
 			var movingDir = null;

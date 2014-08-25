@@ -43,5 +43,7 @@ define(["entity", "dir", "pos", "util"], function (Entity, Dir, Pos, Util) {
 	}
 	WalkingThing.toData = Entity.toData;
 	WalkingThing.fromData = Entity.fromData;
+	WalkingThing.toBinary = Entity.toBinary;
+	WalkingThing.fromBinary = Entity.fromBinary;
 	return WalkingThing;
 });

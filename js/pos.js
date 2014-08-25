@@ -92,5 +92,16 @@ define(["dir"], function (Dir) {
         if (data === null || data === undefined) return data;
         return new Pos(data.x, data.y);
     }
+
+    Pos.prototype.toBinary = function (dataView, index) {
+        dataView.setUint16(index, this.x, true);
+        dataView.setUint16(index+2, this.y, true);
+    }
+
+    Pos.fromBinary = function (dataView, index) {
+        var x = dataView.getUint16(index, true);
+        var y = dataView.getUint16(index+2, true);
+        return new Pos(x, y);
+    } 
     return Pos;
 });
