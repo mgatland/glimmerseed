@@ -172,9 +172,15 @@ define(["entity", "level", "camera", "player"],
 			} else if (data.type === "break") {
 				var pos = data.pos;
 				this.getLevel().setCell(pos.x, pos.y, 0);
+				//update block state
+				var index = getIndexOfUser(gs.players, data.id);
+				gs.players[index].block = 1;
 			} else if (data.type === "lay") {
 				var pos = data.pos;
 				this.getLevel().setCell(pos.x, pos.y, 1);
+				//update block state
+				var index = getIndexOfUser(gs.players, data.id);
+				gs.players[index].block = 0;
 			} else if (data.type === "monsterHost") {
 				console.log("You are the monster host");
 				this.monsterHost = true;

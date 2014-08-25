@@ -198,6 +198,7 @@ io.sockets.on('connection', function (socket) {
             if (user.brick === 0) {
                 io.sockets.emit("data", {
                 type:"break",
+                user: user.id,
                 pos: pos});
                 user.brick = 1;
                 //and apply to server
@@ -210,6 +211,7 @@ io.sockets.on('connection', function (socket) {
                 console.log(dir);
                 io.sockets.emit("data", {
                 type:"lay",
+                user: user.id,
                 pos: pos});
                 setCell(pos.x, pos.y, 1);
                 user.brick = 0;
