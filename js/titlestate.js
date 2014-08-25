@@ -11,6 +11,8 @@ define(["colors"], function (Colors) {
 				document.querySelector("#menu").classList.add("hide");
 				return true;
 			}
+			if (data.type === "p") return true; //ignore
+			if (data.type === "mon") return true; //ignore
 			return false;
 		}
 
