@@ -1,15 +1,14 @@
 "use strict";
 define(["explosion", "events", "colors", "entity", "dir", "pos", 
-	"util", "network"], 
+	"util"], 
 	//TODO: don't have Network here.
-	function (Explosion, Events, Colors, Entity, Dir, Pos, Util,
-		Network) {
+	function (Explosion, Events, Colors, Entity, Dir, Pos, Util) {
 
 	console.log("Define Shot");
 	var shotSpriteH = "111111\n";
 	var shotSpriteV = "1\n1\n1\n1\n1\n1\n";
 
-	var Shot = function (level, pos, dir, owner, isLocal) {
+	var Shot = function (level, pos, dir, owner) {
 		Util.extend(this, new Entity(pos, new Pos(5,1)));
 		var _this = this;
 
@@ -18,8 +17,6 @@ define(["explosion", "events", "colors", "entity", "dir", "pos",
 
 		this.hitsMonsters = (owner === "player");
 		this.killPlayerOnTouch = !this.hitsMonsters;
-
-		this.isLocal = !!isLocal;
 
 		this.pos.moveXY(2,1);
 
@@ -66,17 +63,6 @@ define(["explosion", "events", "colors", "entity", "dir", "pos",
 			if (level.isPointColliding(checkPos)) {
 				if (owner === "player") Events.playSound("hitwall", this.pos.clone());
 				this.live = false;
-
-				if (this.isLocal) {
-					//network collision with wall
-					Network.send({
-						type:"break", 
-						pos:level.posToGridPos(checkPos).toData(),
-						dir: Dir.toId(this.dir)
-					});
-					//test hacks
-					Network.ping();
-				}
 
 				//Move out of wall to place explosion correctly.
 				checkPos.moveInDir(this.dir.reverse, 1);

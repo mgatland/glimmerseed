@@ -20,6 +20,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		this.shotThisFrame = false;
 		this.groundedY = this.pos.y;
 
+		var blockToolRange = 40;
 		var spawnPoint = startPos.clone();
 		var currentCheckpoint = null; //The flag entity we last touched
 
@@ -208,11 +209,25 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 
 		this._shoot = function (isLocal) {
 			var dir = (this.vDir ? this.vDir : this.dir);
-			Events.shoot(new Shot(level, this.pos.clone(), dir, "player", isLocal));
+			//no shooting any more
+			//nope -> Events.shoot(new Shot(level, this.pos.clone(), dir, "player", isLocal));
+			
 			Events.playSound("pshoot", this.pos.clone());
 			//trace a line from the player to a block.
 			var hitGridPos = level.trace(this, dir);
 			var hitPos = level.gridPosToPos(hitGridPos);
+
+			if (isLocal) {
+				//network collision with wall
+				Network.send({
+					type:"break", 
+					pos: hitGridPos.toData(),
+					dir: Dir.toId(dir)
+				});
+				//test hacks
+				Network.ping();
+			}
+
 			Events.explosion(new BlockRemoveFx(dir, "break", hitPos));
 		}
 
