@@ -11,6 +11,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		//Replicated variables
 		this.id = null; //replicated in but not out.
 		this.name = null;
+		this.block = 0;
 		this.state = "falling";
 		this.fallingTime = 0;
 		this.loading = 0;
@@ -20,7 +21,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		this.shotThisFrame = false;
 		this.groundedY = this.pos.y;
 
-		var blockToolRange = 40;
+		var blockToolRange = 7;
 		var spawnPoint = startPos.clone();
 		var currentCheckpoint = null; //The flag entity we last touched
 
@@ -39,6 +40,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 			var data = {};
 			data.id = this.id; //server should ignore this.
 			data.name = undefined; //server will fill it in
+			data.block = this.block;
 			data.state = this.state;
 			data.fallingTime = this.fallingTime;
 			data.loading = this.loading;
@@ -65,6 +67,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		this.fromData = function (data) {
 			this.id = data.id;
 			this.name = data.name;
+			this.block = data.block;
 			this.state = data.state;
 			this.fallingTime = data.fallingTime;
 			this.loading = data.loading;
@@ -212,23 +215,24 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 			//no shooting any more
 			//nope -> Events.shoot(new Shot(level, this.pos.clone(), dir, "player", isLocal));
 			
-			Events.playSound("pshoot", this.pos.clone());
 			//trace a line from the player to a block.
 			var hitGridPos = level.trace(this, dir);
 			var hitPos = level.gridPosToPos(hitGridPos);
-
-			if (isLocal) {
+			var inRange = (level.posToGridPos(this.pos).distanceTo(hitGridPos) < blockToolRange);
+			if (isLocal && inRange) {
+				Events.playSound("pshoot", this.pos.clone());
 				//network collision with wall
 				Network.send({
 					type:"break", 
 					pos: hitGridPos.toData(),
 					dir: Dir.toId(dir)
 				});
+				Events.explosion(new BlockRemoveFx(dir, "break", hitPos));
 				//test hacks
 				Network.ping();
+			} else {
+				Events.playSound("hitwall", this.pos.clone());
 			}
-
-			Events.explosion(new BlockRemoveFx(dir, "break", hitPos));
 		}
 
 		this.hurt = function (hurtPos) {
