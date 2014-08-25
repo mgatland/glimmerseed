@@ -5,7 +5,7 @@ define(["entity", "level", "camera", "player"],
 	//TODO: Events is only passed in so we can access changes made
 	//by the Level initialization. Let's change that, let level
 	//push changes directly to the game state.
-	var PlayingState = function (Events, camera, mapData) {
+	var PlayingState = function (Events, camera, mapData, userData) {
 		this.showTouchButtons = true;
 
 		var tileSize = 10;
@@ -51,6 +51,9 @@ define(["entity", "level", "camera", "player"],
 				gs.players[gs.local].tryMove(0, 10);
 				gs.players[gs.local].groundedY = gs.players[gs.local].pos.y;
 				camera.jumpTo(gs.players[gs.local].pos.x, gs.players[gs.local].groundedY);			
+
+				gs.players[gs.local].id = userData.id;
+				gs.players[gs.local].name = userData.name;
 		};
 
 		this.update = function (keys, Network, Events) {
@@ -160,6 +163,13 @@ define(["entity", "level", "camera", "player"],
 			return index;
 		}
 
+		var setUserBlockState = function (userId, state) {
+			if (userId === undefined || userId === null) return;
+			//update block state
+			var index = getIndexOfUser(gs.players, userId);
+			gs.players[index].block = state;
+		}
+
 		this.gotData = function (data) {
 			if (data.type === "p") {
 				var index = getIndexOfUser(gs.players, data.player.id);
@@ -172,15 +182,11 @@ define(["entity", "level", "camera", "player"],
 			} else if (data.type === "break") {
 				var pos = data.pos;
 				this.getLevel().setCell(pos.x, pos.y, 0);
-				//update block state
-				var index = getIndexOfUser(gs.players, data.id);
-				gs.players[index].block = 1;
+				setUserBlockState(data.userId, 1);
 			} else if (data.type === "lay") {
 				var pos = data.pos;
 				this.getLevel().setCell(pos.x, pos.y, 1);
-				//update block state
-				var index = getIndexOfUser(gs.players, data.id);
-				gs.players[index].block = 0;
+				setUserBlockState(data.userId, 0);
 			} else if (data.type === "monsterHost") {
 				console.log("You are the monster host");
 				this.monsterHost = true;

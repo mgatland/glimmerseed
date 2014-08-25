@@ -6,6 +6,7 @@ define(["colors"], function (Colors) {
 			if (data.type === "loggedin") {
 				console.log("Logged in");
 				this.transition = true;
+				this.userData = data.data; //hacked way to pass data out.
 				//hide the menu
 				document.querySelector("#menu").classList.add("hide");
 				return true;

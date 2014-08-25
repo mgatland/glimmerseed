@@ -25,15 +25,21 @@ require(["events", "colors", "network", "bridge", "playingstate",
 
 		Network.connectToServer(onData);
 
+		var userData = null;
+
 		var update = function(keyboard) {
 
 			if (state.transition === true) {
+				//hack to pass this from a state to the game
+				if (state.userData) {
+					userData = state.userData;
+				}
 				if (state.endStats) {
 					state = new EndLevelState(state.endStats);
 				} else {
 					if (state.levelData) {
 						var levelData = state.levelData;
-						state = new PlayingState(Events, camera, levelData);		
+						state = new PlayingState(Events, camera, levelData, userData);		
 					} else {
 						state = new LoadingLevelState();
 					}

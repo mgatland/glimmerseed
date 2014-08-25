@@ -198,7 +198,7 @@ io.sockets.on('connection', function (socket) {
             if (user.brick === 0) {
                 io.sockets.emit("data", {
                 type:"break",
-                user: user.id,
+                userId: user.id,
                 pos: pos});
                 user.brick = 1;
                 //and apply to server
@@ -211,7 +211,7 @@ io.sockets.on('connection', function (socket) {
                 console.log(dir);
                 io.sockets.emit("data", {
                 type:"lay",
-                user: user.id,
+                userId: user.id,
                 pos: pos});
                 setCell(pos.x, pos.y, 1);
                 user.brick = 0;
@@ -222,7 +222,7 @@ io.sockets.on('connection', function (socket) {
         }
 
         if (data.type === "clearspawn") {
-            console.log(user.name + " died Clearing spawn.");
+            console.log(user.name + " died, Clearing spawn.");
             var pos = data.pos;
             io.sockets.emit("data", {
             type:"break",
