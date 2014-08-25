@@ -95,16 +95,6 @@ define(["entity", "level", "camera", "player"],
 				Network.send({type:"p", player:playerData});
 				netFrame = netFramesToSkip;
 
-				/*//test binary compression
-				var player = gs.players[gs.local];
-				console.log("before");
-				console.log(player.toData());
-				var playerBinary = gs.players[gs.local].toBinary();
-				var playerTest = player.fromBinary(playerBinary);
-				console.log("after");
-				console.log(player.toData());
-				//end of test*/
-
 				if (this.monsterHost) {
 					var netMonsters = [];
 					//send one monster each update
@@ -112,10 +102,9 @@ define(["entity", "level", "camera", "player"],
 					if (monsterToSend >= gs.monsters.length) {
 						monsterToSend = 0;
 					}
-					var monster = gs.monsters[monsterToSend];
+					var monster = gs.monsters[monsterToSend].toData();
 					if (monster) {
-						netMonsters[monsterToSend] = monster.toData();
-						Network.send({type:"mon", monsters:netMonsters});
+						Network.send({type:"mon", monster:monster, index: monsterToSend});
 					}
 				}
 			} else {
@@ -203,13 +192,9 @@ define(["entity", "level", "camera", "player"],
 				console.log("You are the monster host");
 				this.monsterHost = true;
 			} else if (data.type === "mon") {
-				console.log("got monsters");
-				gs.monsters.forEach(function (monster, index) {
-					var monsterData = data.monsters[index];
-					if (monsterData) {
-						monster.fromData(data.monsters[index]);
-					}
-				});
+				console.log("got a monster update");
+				var index = data.index;
+				gs.monsters[index].fromData(data.monster);
 			} else if (data.type === "dc") {
 				var index = getIndexOfUser(gs.players, data.id);
 				if (index != null) {
