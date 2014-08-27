@@ -38,8 +38,33 @@ define([], function () {
     socket = io.connect("http://" + document.domain + ":" + port);
 
     socket.on('connect', function () {
-        // first we want users to enter their names
-        console.log("Connected!");
+        console.log("Connected");
+    });
+
+    socket.on('error', function (e) {
+    	console.log('socket error');
+    	console.log(e);
+    });
+
+    socket.on('disconnect', function () {
+    	console.log('disconnect');
+    });
+
+    socket.on('reconnect', function () {
+    	console.log('reconnect');
+    });
+
+    socket.on('reconnecting', function () {
+    	console.log('reconnecting');
+    });
+
+    socket.on('reconnect_error', function (e) {
+    	console.log('reconnect error');
+    	console.log(e);
+    });
+
+    socket.on('reconnect_failed', function () {
+    	console.log('reconnect failed');
     });
 
     socket.on('data', function (data) {
