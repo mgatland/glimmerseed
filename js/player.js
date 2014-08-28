@@ -335,7 +335,6 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 
 		var networkBreak = function (pos, dir) {
 			//network collision with wall
-			console.log(pos);
 			Network.send({
 				type:"break", 
 				pos: pos.toData(),
