@@ -69,13 +69,15 @@ define(["monster", "player", "events", "colors", "pos"],
 
 		//actor must have pos, size
 		//this returns a grid coord, not real coord
-		this.trace = function (actor, dir) {
+		this.trace = function (actor, dir, range) {
+			if (range === undefined) range === 99999;
 			var tracePos = actor.pos.clone();
 			tracePos.moveXY(
 				Math.floor(actor.size.x/2), 
 				Math.floor(actor.size.y/2));
-			while (!this.isPointColliding(tracePos)) {
+			while (!this.isPointColliding(tracePos) && range > 0) {
 				tracePos.moveInDir(dir, tileSize);
+				range--;
 			}
 			return this.posToGridPos(tracePos);
 		}
@@ -118,6 +120,10 @@ define(["monster", "player", "events", "colors", "pos"],
 			return depth;
 		}
 
+		this.isSolidAtGridPos = function(gridPos) {
+			return this.isSolid(gridPos.x, gridPos.y);
+		}
+
 		this.isSolid = function(x, y) {
 			if (x < 0) return true;
 			if (y < 0) return true;
@@ -125,6 +131,7 @@ define(["monster", "player", "events", "colors", "pos"],
 			if (map[y][x] === 0) return false;
 			return true;
 		}
+
 		this.draw = function(painter) {
 			var bounds = painter.screenBounds();
 			var minX = Math.floor(bounds.minX / tileSize);

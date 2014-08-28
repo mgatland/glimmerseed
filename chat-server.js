@@ -189,7 +189,6 @@ io.sockets.on('connection', function (socket) {
         if (data.type === "break") {
 
             var pos = data.pos;
-            var dir = data.dir;
 
             //broadcast to all players including sender
             if (user.brick === 0) {
@@ -201,11 +200,6 @@ io.sockets.on('connection', function (socket) {
                 //and apply to server
                 setCell(pos.x, pos.y, 0);
             } else {
-                if (dir === 3) pos.x--;
-                if (dir === 2) pos.x++;
-                if (dir === 1) pos.y--;
-                if (dir === 0) pos.y++;
-                console.log(dir);
                 io.sockets.emit("data", {
                 type:"lay",
                 userId: user.id,

@@ -21,7 +21,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 		this.shotThisFrame = false;
 		this.groundedY = this.pos.y;
 
-		var blockToolRange = 6;
+		var blockToolRange = 2;
 		var spawnPoint = startPos.clone();
 		var currentCheckpoint = null; //The flag entity we last touched
 
@@ -303,6 +303,12 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 					this.dir, img, Colors.highlight, false, decay, hitPos);
 			}
 
+			if (this.vDir) {
+				drawTargetDot(painter, this.vDir);	
+			} else {
+				drawTargetDot(painter, this.dir);
+			}
+
 			if (this.name) {
 				var name = this.name;
 				painter.drawText(this.pos.x - name.length * 1.5, this.pos.y + 10,
@@ -311,10 +317,32 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 			
 		}
 
+		var drawTargetDot = function (painter, dir) {
+			//draw targetting dots
+			var targetGrid = level.trace(_this, dir, blockToolRange);
+			if (level.isSolidAtGridPos(targetGrid) && _this.block === 1) {
+				targetGrid.moveInDir(dir.reverse, 1);
+			}
+			var targetPos = level.gridPosToPos(targetGrid);
+			painter.drawRect(targetPos.x+4, targetPos.y+4, 2, 2, Colors.background);
+		}
+
 		this.isOnGround = function () {
 			var leftFoot = level.isPointColliding(this.pos.clone().moveXY(0,this.size.y));
 			var rightFoot = level.isPointColliding(this.pos.clone().moveXY(this.size.x-1,this.size.y));
 			return (leftFoot || rightFoot);
+		}
+
+		var networkBreak = function (pos, dir) {
+			//network collision with wall
+			console.log(pos);
+			Network.send({
+				type:"break", 
+				pos: pos.toData(),
+				dir: Dir.toId(dir)
+			});
+			//Also do a ping test.
+			Network.ping();
 		}
 
 		this._shoot = function (isLocal) {
@@ -323,37 +351,25 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 			//nope -> Events.shoot(new Shot(level, this.pos.clone(), dir, "player", isLocal));
 			
 			//trace a line from the player to a block.
-			var hitGridPos = level.trace(this, dir);
-			var inRange = (level.posToGridPos(this.pos).distanceTo(hitGridPos) <= blockToolRange);
-			if (inRange) {
-				Events.playSound("pshoot", this.pos.clone());
+			var hitGridPos = level.trace(this, dir, blockToolRange);
+			var isHit = level.isSolid(hitGridPos.x, hitGridPos.y);
 
-				if (this.block === 0) {
-					this.block = 1;
-					var hitPos = level.gridPosToPos(hitGridPos);
-					Events.explosion(new BlockRemoveFx(dir, "break", hitPos));
-				} else {
-					this.block = 0;
-					var movedGridPos = hitGridPos.clone().moveInDir(dir.reverse, 1);
-					var movedHitPos = level.gridPosToPos(movedGridPos);
-					Events.explosion(new BlockRemoveFx(dir, "break", movedHitPos));
-				}
-				if (isLocal) {
-					//network collision with wall
-					Network.send({
-						type:"break", 
-						pos: hitGridPos.toData(),
-						dir: Dir.toId(dir)
-					});
-					//Also do a ping test.
-					Network.ping();
-				}
-			} else {
+			if (this.block === 0 && !isHit) {
+				//miss
 				Events.playSound("hitwall", this.pos.clone());
-				var missGridPos = level.posToGridPos(this.pos);
-				missGridPos.moveInDir(dir, blockToolRange);
-				var missPos = level.gridPosToPos(missGridPos);
-				Events.explosion(new BlockRemoveFx(dir, "fail", missPos));
+				var missPos = level.gridPosToPos(hitGridPos);
+				Events.explosion(new BlockRemoveFx(dir, "fail", missPos));				
+			} else {
+				if (isHit && this.block === 1) {
+					hitGridPos.moveInDir(dir.reverse, 1);
+				}
+				Events.playSound("pshoot", this.pos.clone());
+				this.block = (this.block === 1 ? 0: 1);
+				var hitPos = level.gridPosToPos(hitGridPos);
+				Events.explosion(new BlockRemoveFx(dir, "break", hitPos));
+				if (isLocal) {
+					networkBreak(hitGridPos, dir);
+				}
 			}
 		}
 
