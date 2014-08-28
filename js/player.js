@@ -418,7 +418,7 @@ define(["shot", "events", "colors", "walkingthing", "sprites", "dir", "pos", "ut
 				this.vDir = null;
 			}
 
-			if (keys.shootHit || keys.shoot && this.loading === 0) {
+			if (keys.shoot && this.loading === 0) {
 				this.loading = this.refireRate;
 				this._shoot(true);
 				this.shotThisFrame = true;
