@@ -83,13 +83,16 @@ require(["events", "colors", "network", "bridge", "playingstate",
 			audio.update();
 		}
 
+		var isSpectator = new URL(window.location.href).searchParams.get("spectator") != undefined
+		console.log(isSpectator)
 		var pixelWindow = {width:192, height:104}; //I could fit 200 x 120 on Galaxy s3 at 4x pixel scale
-		var camera = new Camera(pixelWindow);
+		var camera = new Camera(pixelWindow, isSpectator);
 		var scale = 4;
 
 		var desiredFps = 60;
 
-		var bridge = new Bridge(pixelWindow, scale, desiredFps);
+		if (isSpectator) scale = 1;
+		var bridge = new Bridge(pixelWindow, scale, desiredFps, isSpectator);
 		var touch = bridge.createTouch();
 		var keyboard = bridge.createKeyboard(touch);
 		var painter = bridge.createPainter();

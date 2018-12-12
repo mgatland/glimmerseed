@@ -54,10 +54,15 @@ define(["pos", "dir", "colors"], function (Pos, Dir, Colors) {
 		//size defaults to 10
 		this.drawText = function(x, y, text, color, relative, size) {
 			if (!size) size = 10;
-			ctx.font = (pixelSize * size) + "px Star Perv";
+			let screenSize = pixelSize * size;
 			var myPos = (relative === true ? pos : noOffset);
+			let screenX = Math.floor((x - myPos.x) * pixelSize)
+			let screenY = Math.floor((y - myPos.y) * pixelSize)
+			//make sharp: font must be drawn in multiples of... something
+			screenSize = Math.ceil(screenSize / 8) * 8;
+			ctx.font = screenSize + "px Star Perv";
 			setColor(color);
-			ctx.fillText(text, (x - myPos.x) * pixelSize, (y - myPos.y) * pixelSize);
+			ctx.fillText(text, screenX, screenY);
 		}
 
 		this.screenBounds = function () {

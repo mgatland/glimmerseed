@@ -4,7 +4,7 @@ define(["keyboard", "touch", "painter", "leveleditor"],
 
 	//Bridge links the game to the browser.
 	//It deals with browser-related functionality like when the page is resized.
-	var Bridge = function (pixelWindow, scale, desiredFps) {
+	var Bridge = function (pixelWindow, scale, desiredFps, isSpectator) {
 
 		var gameTime = null;
 		var frameDelay = 1000/desiredFps;
@@ -55,6 +55,16 @@ define(["keyboard", "touch", "painter", "leveleditor"],
 			var resizeGame = function() {
 				var newWidth = window.innerWidth;
 				var newHeight = window.innerHeight;
+
+				if (isSpectator) {
+					//hacks
+					pixelWindow.width = newWidth - borderThickness * 2 - 2
+					pixelWindow.height = newHeight - borderThickness * 2 - 2
+					widthToHeight = pixelWindow.width / pixelWindow.height;
+					var canvas = document.getElementById('gamescreen');
+					canvas.width = pixelWindow.width*scale;
+					canvas.height = pixelWindow.height*scale;
+				}
 
 				if (newWidth > pixelWindow.width * scale + borderThickness * 2
 					&& newHeight > pixelWindow.height * scale + borderThickness * 2) {
